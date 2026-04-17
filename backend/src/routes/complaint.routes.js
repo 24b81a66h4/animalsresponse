@@ -3,6 +3,8 @@ const router = express.Router();
 const complaintController = require('../controllers/complaint.controller');
 const { protect, admin, ngo } = require('../middleware/auth.middleware');
 
+router.get('/public', complaintController.getPublicComplaints);
+
 router.route('/')
     .post(protect, complaintController.createComplaint)
     .get(protect, complaintController.getComplaints);

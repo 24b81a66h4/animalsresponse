@@ -5,11 +5,7 @@ import AppRoutes from './routes';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
-        <main className="flex-grow">
-          <AppRoutes />
-        </main>
-      </div>
+      <AppRoutes />
     </Router>
   );
 }

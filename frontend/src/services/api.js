@@ -6,9 +6,18 @@ const API = axios.create({
 
 // attach token automatically
 API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+  let user = null;
+  try {
+    const userStr = localStorage.getItem("user");
+    if (userStr && userStr !== "undefined") {
+      user = JSON.parse(userStr);
+    }
+  } catch (e) {
+    console.error("Failed to parse user from localStorage", e);
+  }
+  
+  if (user && user.token) {
+    req.headers.Authorization = `Bearer ${user.token}`;
   }
   return req;
 });
