@@ -102,7 +102,9 @@ const updateComplaintStatus = async (req, res) => {
             return res.status(404).json({ message: 'Complaint not found' });
         }
 
-        complaint.status = status;
+        // Standardize status to lowercase to match DB enum
+        const normalizedStatus = status.toLowerCase().replace(' ', '-');
+        complaint.status = normalizedStatus;
         const updated = await complaint.save();
 
         if (complaint.user_id) {

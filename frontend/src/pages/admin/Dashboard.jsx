@@ -70,6 +70,24 @@ const AdminDashboard = () => {
         }
     };
 
+    const updateStatus = async (complaintId, newStatus) => {
+        try {
+            setAssigning(complaintId);
+            const res = await axios.put(
+                `${BASE}/complaints/${complaintId}/status`,
+                { status: newStatus },
+                { headers }
+            );
+            setComplaints(prev =>
+                prev.map(c => c._id === complaintId ? { ...c, status: newStatus } : c)
+            );
+        } catch (err) {
+            alert('Failed to update status: ' + (err.response?.data?.message || err.message));
+        } finally {
+            setAssigning(null);
+        }
+    };
+
     // Derived counts
     const total      = complaints.length;
     const pending    = complaints.filter(c => c.status === 'pending' || c.status === 'open').length;
@@ -167,7 +185,6 @@ const AdminDashboard = () => {
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Reporter</th>
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Assigned NGO</th>
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Assign NGO</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -195,33 +212,17 @@ const AdminDashboard = () => {
                                         }
                                     </td>
                                     <td className="px-4 py-3">
-                                        <span className={`px-2.5 py-1 text-xs rounded-full font-medium capitalize ${STATUS_COLOR[c.status] || 'bg-gray-100 text-gray-700'}`}>
-                                            {c.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        {c.status === 'resolved' || c.status === 'closed' ? (
-                                            <span className="text-xs text-gray-400 italic">Completed</span>
-                                        ) : (
-                                            <div className="flex items-center gap-2">
-                                                <select
-                                                    defaultValue=""
-                                                    onChange={e => assignNgo(c._id, e.target.value)}
-                                                    disabled={assigning === c._id}
-                                                    className="border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-60"
-                                                >
-                                                    <option value="" disabled>
-                                                        {c.assigned_to ? `Reassign…` : 'Select NGO…'}
-                                                    </option>
-                                                    {ngoUsers.map(n => (
-                                                        <option key={n._id} value={n._id}>{n.name}</option>
-                                                    ))}
-                                                </select>
-                                                {assigning === c._id && (
-                                                    <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                                                )}
-                                            </div>
-                                        )}
+                                        <select
+                                            value={c.status?.toLowerCase()}
+                                            onChange={e => updateStatus(c._id, e.target.value)}
+                                            className={`px-2 py-1 text-xs rounded-full font-medium capitalize border-none focus:ring-2 focus:ring-blue-300 ${STATUS_COLOR[c.status] || 'bg-gray-100 text-gray-700'}`}
+                                        >
+                                            <option value="pending">Pending</option>
+                                            <option value="open">Open</option>
+                                            <option value="in-progress">In Progress</option>
+                                            <option value="resolved">Resolved</option>
+                                            <option value="closed">Closed</option>
+                                        </select>
                                     </td>
                                 </tr>
                             ))}

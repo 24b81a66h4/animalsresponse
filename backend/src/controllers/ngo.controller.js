@@ -124,7 +124,9 @@ const updateNgoComplaintStatus = async (req, res) => {
             return res.status(403).json({ message: 'Not authorized for this complaint' });
         }
 
-        complaint.status = status;
+        // Standardize status to lowercase to match DB enum
+        const normalizedStatus = status.toLowerCase().replace(' ', '-');
+        complaint.status = normalizedStatus;
         const updated = await complaint.save();
 
         if (complaint.user_id) {

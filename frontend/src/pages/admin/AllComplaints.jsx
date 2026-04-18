@@ -30,11 +30,14 @@ export default function AllComplaints() {
 
           <select
             onChange={(e) => updateStatus(c._id, e.target.value)}
-            defaultValue={c.status}
+            value={c.status}
+            className="border rounded p-1 text-sm mt-2"
           >
-            <option>Pending</option>
-            <option>In Progress</option>
-            <option>Resolved</option>
+            <option value="pending">Pending</option>
+            <option value="open">Open</option>
+            <option value="in-progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
           </select>
         </div>
       ))}

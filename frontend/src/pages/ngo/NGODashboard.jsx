@@ -160,7 +160,7 @@ const NGODashboard = () => {
                                     </td>
                                     <td className="px-5 py-4 border-b border-gray-100">
                                         <select
-                                            value={c.status}
+                                            value={c.status?.toLowerCase()}
                                             onChange={(e) => handleStatusChange(c._id, e.target.value)}
                                             disabled={updating === c._id}
                                             className="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none disabled:opacity-60"
