@@ -2,11 +2,18 @@ import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from './routes';
 
+import { AuthProvider } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
+
 function App() {
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <AuthProvider>
+      <SocketProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </SocketProvider>
+    </AuthProvider>
   );
 }
 

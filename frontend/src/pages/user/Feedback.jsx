@@ -1,53 +1,133 @@
-import React, { useState, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../../context/AuthContext";
-import { useParams } from "react-router-dom";
+import React, { useState, useContext, useEffect } from 'react';
+import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const Feedback = () => {
-  const { id } = useParams();
-  const { user } = useContext(AuthContext);
-  const [text, setText] = useState("");
+    const { id } = useParams(); // complaint id
+    const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-  const submitFeedback = async (e) => {
-    e.preventDefault();
+    const [rating, setRating] = useState(0);
+    const [hovered, setHovered] = useState(0);
+    const [comment, setComment] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [existing, setExisting] = useState(null);
+    const [error, setError] = useState('');
 
-    try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
+    useEffect(() => {
+        const check = async () => {
+            try {
+                const res = await axios.get(`http://localhost:5000/api/feedback/${id}`, {
+                    headers: { Authorization: `Bearer ${user.token}` },
+                });
+                if (res.data) setExisting(res.data);
+            } catch (_) {}
+        };
+        check();
+    }, [id, user]);
 
-      await axios.post(
-        `http://localhost:5000/api/complaints/${id}/feedback`,
-        { text },
-        config
-      );
+    const handleSubmit = async () => {
+        if (rating === 0) { setError('Please select a rating'); return; }
+        try {
+            setLoading(true);
+            await axios.post(
+                `http://localhost:5000/api/feedback/${id}`,
+                { rating, comment },
+                { headers: { Authorization: `Bearer ${user.token}` } }
+            );
+            navigate('/user/complaints');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to submit feedback');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      alert("Feedback submitted");
-      setText("");
-    } catch (err) {
-      alert("Failed to submit feedback");
+    const LABELS = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+
+    if (existing) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+                <div className="bg-white border border-gray-200 rounded-2xl p-8 max-w-md w-full text-center">
+                    <div className="text-5xl mb-4">✅</div>
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">Feedback Already Submitted</h2>
+                    <div className="flex justify-center gap-1 my-4">
+                        {[1,2,3,4,5].map((s) => (
+                            <span key={s} className={`text-2xl ${s <= existing.rating ? 'text-amber-400' : 'text-gray-200'}`}>★</span>
+                        ))}
+                    </div>
+                    {existing.comment && <p className="text-gray-500 text-sm italic">"{existing.comment}"</p>}
+                    <button onClick={() => navigate('/user/complaints')}
+                        className="mt-6 text-sm text-emerald-600 hover:underline">
+                        Back to Complaints
+                    </button>
+                </div>
+            </div>
+        );
     }
-  };
 
-  return (
-    <div className="max-w-md mx-auto p-4">
-      <h2 className="text-xl font-bold mb-4">Give Feedback</h2>
+    return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 max-w-md w-full">
+                <div className="text-center mb-6">
+                    <div className="text-4xl mb-2">⭐</div>
+                    <h2 className="text-xl font-bold text-gray-800">Rate the Response</h2>
+                    <p className="text-sm text-gray-500 mt-1">How satisfied are you with how this was handled?</p>
+                </div>
 
-      <form onSubmit={submitFeedback}>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="w-full p-2 border mb-3"
-          placeholder="Write your feedback..."
-          required
-        />
+                {error && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+                        {error}
+                    </div>
+                )}
 
-        <button className="bg-green-600 text-white px-4 py-2 rounded">
-          Submit
-        </button>
-      </form>
-    </div>
-  );
+                {/* Star Rating */}
+                <div className="flex justify-center gap-2 mb-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                            key={star}
+                            onMouseEnter={() => setHovered(star)}
+                            onMouseLeave={() => setHovered(0)}
+                            onClick={() => setRating(star)}
+                            className="text-4xl transition-transform hover:scale-110"
+                        >
+                            <span className={star <= (hovered || rating) ? 'text-amber-400' : 'text-gray-200'}>
+                                ★
+                            </span>
+                        </button>
+                    ))}
+                </div>
+
+                <p className="text-center text-sm font-medium text-amber-600 mb-5 h-5">
+                    {LABELS[hovered || rating]}
+                </p>
+
+                <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Share your experience (optional)..."
+                    rows={4}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none mb-4"
+                />
+
+                <button
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-xl transition disabled:opacity-60"
+                >
+                    {loading ? 'Submitting...' : 'Submit Feedback'}
+                </button>
+
+                <button
+                    onClick={() => navigate('/user/complaints')}
+                    className="w-full mt-2 py-2 text-sm text-gray-400 hover:text-gray-600 transition"
+                >
+                    Skip for now
+                </button>
+            </div>
+        </div>
+    );
 };
 
 export default Feedback;

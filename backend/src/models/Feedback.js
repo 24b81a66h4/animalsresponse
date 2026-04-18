@@ -4,22 +4,29 @@ const feedbackSchema = new mongoose.Schema({
     complaint_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Complaint',
-        required: true
+        required: true,
+        unique: true,
     },
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
+    },
+    ngo_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     },
     rating: {
         type: Number,
         min: 1,
         max: 5,
-        required: true
+        required: true,
     },
     comment: {
-        type: String
-    }
+        type: String,
+        trim: true,
+        maxlength: 500,
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Feedback', feedbackSchema);

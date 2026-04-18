@@ -1,25 +1,14 @@
-const multer = require('multer');
-const path = require('path');
+const { upload } = require('../config/cloudinary');
 
-// Store in memory (for cloud upload)
-const storage = multer.memoryStorage();
+const uploadMedia = upload.array('media', 5); // max 5 files
 
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|mp4|mov/;
-    const ext = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowedTypes.test(file.mimetype);
-
-    if (ext && mime) {
-        return cb(null, true);
-    } else {
-        cb(new Error('Only images and videos are allowed'));
-    }
+const handleUpload = (req, res, next) => {
+    uploadMedia(req, res, (err) => {
+        if (err) {
+            return res.status(400).json({ message: err.message });
+        }
+        next();
+    });
 };
 
-const upload = multer({
-    storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-    fileFilter
-});
-
-module.exports = upload;
+module.exports = { handleUpload };

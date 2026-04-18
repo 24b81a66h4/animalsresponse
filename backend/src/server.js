@@ -1,17 +1,18 @@
-require('dotenv').config();
-
 const app = require('./app');
+const http = require('http');
 const connectDB = require('./config/db');
+const { initSocket } = require('./config/socket');
+const { startEscalationJob } = require('./services/escalation.service');
+require('dotenv').config();
 
 const PORT = process.env.PORT || 5000;
 
-// Connect DB and start server
-connectDB()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-        });
-    })
-    .catch(err => {
-        console.error("❌ DB connection failed:", err.message);
-    });
+connectDB();
+
+const server = http.createServer(app);
+initSocket(server);
+startEscalationJob(); // 👈 starts the hourly cron
+
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});

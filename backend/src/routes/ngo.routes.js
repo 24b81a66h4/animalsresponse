@@ -4,13 +4,11 @@ const router = express.Router();
 const ngoController = require('../controllers/ngo.controller');
 const { protect, ngo } = require('../middleware/auth.middleware');
 
-// @route   GET /api/ngo/profile
 router.get('/profile', protect, ngo, ngoController.getNgoProfile);
-
-// @route   GET /api/ngo/complaints
+router.get('/analytics', protect, ngo, ngoController.getNgoAnalytics);
+router.get('/available-complaints', protect, ngo, ngoController.getAvailableComplaints);
 router.get('/complaints', protect, ngo, ngoController.getAssignedComplaints);
-
-// @route   PUT /api/ngo/complaints/:id/status
+router.put('/complaints/:id/assign', protect, ngo, ngoController.selfAssignComplaint);
 router.put('/complaints/:id/status', protect, ngo, ngoController.updateNgoComplaintStatus);
 
 module.exports = router;
