@@ -1,4 +1,4 @@
-import { categories } from '../../utils/constants';
+import { CATEGORY } from '../../utils/constants';
 
 function CategorySelect({ value, onChange }) {
     return (
@@ -7,7 +7,7 @@ function CategorySelect({ value, onChange }) {
             onChange={(e) => onChange(e.target.value)}
             className="border p-2 rounded w-full"
         >
-            {categories.map((cat) => (
+            {CATEGORY.map((cat) => (
                 <option key={cat} value={cat}>
                     {cat}
                 </option>
