@@ -5,13 +5,11 @@ import { AuthContext } from '../../context/AuthContext';
 const AdminDashboard = () => {
     const { user, logout } = useContext(AuthContext);
     const [complaints, setComplaints] = useState([]);
-    const [ngoUsers, setNgoUsers] = useState([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (!user) return;
         fetchComplaints();
-        fetchNGOUsers();
     }, [user]);
 
     const fetchComplaints = async () => {
@@ -24,49 +22,6 @@ const AdminDashboard = () => {
             alert('Failed to fetch complaints');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const fetchNGOUsers = async () => {
-        try {
-            const config = { headers: { Authorization: `Bearer ${user.token}` } };
-            const res = await axios.get('http://localhost:5000/api/admin/ngo-users', config);
-            setNgoUsers(res.data);
-        } catch (err) {
-            console.log('Failed to fetch NGO users');
-        }
-    };
-
-    const handleStatusChange = async (id, newStatus) => {
-        try {
-            const config = { headers: { Authorization: `Bearer ${user.token}` } };
-            await axios.put(
-                `http://localhost:5000/api/complaints/${id}/status`,
-                { status: newStatus },
-                config
-            );
-            setComplaints(prev =>
-                prev.map(c => c._id === id ? { ...c, status: newStatus } : c)
-            );
-        } catch {
-            alert('Failed to update status');
-        }
-    };
-
-    const handleAssignNGO = async (id, ngoUserId) => {
-        if (!ngoUserId) return;
-        try {
-            const config = { headers: { Authorization: `Bearer ${user.token}` } };
-            await axios.put(
-                `http://localhost:5000/api/complaints/${id}/assign`,
-                { ngo_user_id: ngoUserId },
-                config
-            );
-            setComplaints(prev =>
-                prev.map(c => c._id === id ? { ...c, assigned_to: ngoUserId, status: 'Assigned' } : c)
-            );
-        } catch {
-            alert('Failed to assign complaint');
         }
     };
 
@@ -130,9 +85,8 @@ const AdminDashboard = () => {
                                 <th className="px-4 py-3 bg-gray-100 text-left text-xs font-semibold uppercase">Title</th>
                                 <th className="px-4 py-3 bg-gray-100 text-left text-xs font-semibold uppercase">Category</th>
                                 <th className="px-4 py-3 bg-gray-100 text-left text-xs font-semibold uppercase">Reporter</th>
+                                <th className="px-4 py-3 bg-gray-100 text-left text-xs font-semibold uppercase">Assigned NGO</th>
                                 <th className="px-4 py-3 bg-gray-100 text-left text-xs font-semibold uppercase">Status</th>
-                                <th className="px-4 py-3 bg-gray-100 text-left text-xs font-semibold uppercase">Assign to NGO</th>
-                                <th className="px-4 py-3 bg-gray-100 text-left text-xs font-semibold uppercase">Update Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -144,37 +98,13 @@ const AdminDashboard = () => {
                                     </td>
                                     <td className="px-4 py-3 border-b text-sm">{c.category}</td>
                                     <td className="px-4 py-3 border-b text-sm">{c.user_id?.name || 'Unknown'}</td>
+                                    <td className="px-4 py-3 border-b text-sm">
+                                        {c.assignedTo ? c.assignedTo : "Not yet accepted"}
+                                    </td>
                                     <td className="px-4 py-3 border-b">
                                         <span className={`px-2 py-1 text-xs rounded ${getStatusColor(c.status)}`}>
                                             {c.status}
                                         </span>
-                                    </td>
-                                    <td className="px-4 py-3 border-b">
-                                        <select
-                                            className="border p-1 rounded text-sm"
-                                            defaultValue=""
-                                            onChange={(e) => handleAssignNGO(c._id, e.target.value)}
-                                        >
-                                            <option value="" disabled>Select NGO</option>
-                                            {ngoUsers.map(ngo => (
-                                                <option key={ngo._id} value={ngo._id}>
-                                                    {ngo.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </td>
-                                    <td className="px-4 py-3 border-b">
-                                        <select
-                                            value={c.status}
-                                            onChange={(e) => handleStatusChange(c._id, e.target.value)}
-                                            className="border p-1 rounded text-sm"
-                                        >
-                                            <option>Pending</option>
-                                            <option>Assigned</option>
-                                            <option>In Progress</option>
-                                            <option>Resolved</option>
-                                            <option>Rejected</option>
-                                        </select>
                                     </td>
                                 </tr>
                             ))}
