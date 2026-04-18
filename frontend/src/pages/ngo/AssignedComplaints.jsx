@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 
-const BASE = "http://localhost:5000/api/ngo";
+const BASE = `${import.meta.env.VITE_API_URL}/ngo`;
 
 const AssignedComplaints = () => {
   const { user } = useContext(AuthContext);

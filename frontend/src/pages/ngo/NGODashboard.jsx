@@ -3,7 +3,7 @@ import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 
-const BASE = 'http://localhost:5000/api/ngo';
+const BASE = `${import.meta.env.VITE_API_URL}/ngo`;
 
 const STATUS_COLOR = {
     'pending':     'bg-yellow-100 text-yellow-800',

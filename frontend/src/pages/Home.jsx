@@ -11,7 +11,7 @@ const Home = () => {
     useEffect(() => {
         const fetchPublicComplaints = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/complaints/public');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/complaints/public`);
                 setPublicComplaints(res.data);
             } catch (err) {
                 console.error('Failed to fetch public complaints', err);

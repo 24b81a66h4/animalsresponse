@@ -28,7 +28,7 @@ export const SocketProvider = ({ children }) => {
         // Fetch historical notifications
         fetchNotifications();
 
-        socketRef.current = io('http://localhost:5000');
+        socketRef.current = io(import.meta.env.VITE_API_URL.replace('/api', ''));
         socketRef.current.emit('join', user._id);
 
         socketRef.current.on('notification', (data) => {

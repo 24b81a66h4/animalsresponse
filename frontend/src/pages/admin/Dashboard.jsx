@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 
-const BASE = 'http://localhost:5000/api';
+const BASE = import.meta.env.VITE_API_URL;
 
 const STATUS_COLOR = {
     'pending':     'bg-yellow-100 text-yellow-800',
