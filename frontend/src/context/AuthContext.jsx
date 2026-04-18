@@ -22,38 +22,24 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const response = await API.post('/auth/login', { email, password });
-
-            // 🔥 IMPORTANT FIX
-            const { token, user } = response.data;
-
-            // Save token separately
-            localStorage.setItem('token', token);
-
-            // Save user separately
-            localStorage.setItem('user', JSON.stringify(user));
-
-            setUser(user);
-
-            return user;
+            localStorage.setItem('user', JSON.stringify(response.data));
+            setUser(response.data);
+            return response.data;
         } catch (error) {
-            throw error.response?.data?.message || 'Login failed';
+            // Always throw a string, never an object
+            throw error.response?.data?.message || error.message || 'Login failed';
         }
     };
 
     const register = async (userData) => {
         try {
             const response = await API.post('/auth/register', userData);
-
-            const { token, user } = response.data;
-
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-
-            setUser(user);
-
-            return user;
+            localStorage.setItem('user', JSON.stringify(response.data));
+            setUser(response.data);
+            return response.data;
         } catch (error) {
-            throw error.response?.data?.message || 'Registration failed';
+            // Always throw a string, never an object
+            throw error.response?.data?.message || error.message || 'Registration failed';
         }
     };
 

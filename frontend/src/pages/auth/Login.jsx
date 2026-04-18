@@ -33,7 +33,14 @@ const Login = () => {
             else if (userData.role === 'ngo') navigate('/ngo/dashboard');
             else navigate('/user/dashboard');
         } catch (err) {
-            setError(err);
+             // err might be an object, force it to string
+            if (typeof err === 'string') {
+                setError(err);
+            } else if (err?.message) {
+                setError(err.message);
+            } else {
+                setError('Login failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }

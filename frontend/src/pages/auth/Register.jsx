@@ -34,7 +34,13 @@ const Register = () => {
             else navigate('/user/dashboard');
 
         } catch (err) {
-            setError(err);
+            if (typeof err === 'string') {
+                setError(err);
+            } else if (err?.message) {
+            setError(err.message);
+            } else {
+                setError('Registration failed. Please try again.');
+            }
         } finally {
             setLoading(false);
         }
