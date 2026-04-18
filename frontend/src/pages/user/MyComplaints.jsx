@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const STATUS_OPTIONS = ['all', 'pending', 'open', 'in-progress', 'resolved', 'closed'];
 const PRIORITY_OPTIONS = ['all', 'low', 'medium', 'high', 'critical'];
@@ -24,6 +24,7 @@ const PRIORITY_COLORS = {
 
 const MyComplaints = () => {
     const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [complaints, setComplaints] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -152,31 +153,43 @@ const MyComplaints = () => {
                 ) : (
                     <div className="space-y-3">
                         {filtered.map((c) => (
-                            <Link
-                                key={c._id}
-                                to={`/user/complaints/${c._id}`}
-                                className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-emerald-300 hover:shadow-sm transition"
-                            >
-                                <div className="flex justify-between items-start gap-3">
-                                    <div className="flex-1">
-                                        <h3 className="font-medium text-gray-800">{c.title}</h3>
-                                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">{c.description}</p>
-                                        <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-400">
-                                            {c.location?.address && <span>📍 {c.location.address}</span>}
-                                            <span>🕒 {new Date(c.createdAt).toLocaleDateString()}</span>
-                                            {c.media?.length > 0 && <span>📎 {c.media.length} file(s)</span>}
+                            <div key={c._id} className="relative group">
+                                <Link
+                                    to={`/user/complaints/${c._id}`}
+                                    className="block bg-white border border-gray-200 rounded-xl p-5 hover:border-emerald-300 hover:shadow-sm transition"
+                                >
+                                    <div className="flex justify-between items-start gap-3">
+                                        <div className="flex-1">
+                                            <h3 className="font-medium text-gray-800">{c.title}</h3>
+                                            <p className="text-sm text-gray-500 mt-1 line-clamp-2">{c.description}</p>
+                                            <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-400">
+                                                {c.location?.address && <span>📍 {c.location.address}</span>}
+                                                <span>🕒 {new Date(c.createdAt).toLocaleDateString()}</span>
+                                                {c.media?.length > 0 && <span>📎 {c.media.length} file(s)</span>}
+                                                {c.assigned_to?.name && (
+                                                    <span className="text-emerald-600 font-medium">✅ NGO: {c.assigned_to.name}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-1.5 items-end">
+                                            <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${STATUS_COLORS[c.status] || 'bg-gray-100'}`}>
+                                                {c.status}
+                                            </span>
+                                            <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${PRIORITY_COLORS[c.priority] || 'bg-gray-100'}`}>
+                                                {c.priority}
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col gap-1.5 items-end">
-                                        <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${STATUS_COLORS[c.status] || 'bg-gray-100'}`}>
-                                            {c.status}
-                                        </span>
-                                        <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${PRIORITY_COLORS[c.priority] || 'bg-gray-100'}`}>
-                                            {c.priority}
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
+                                </Link>
+                                {c.status === 'resolved' && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); navigate(`/user/feedback/${c._id}`); }}
+                                        className="mt-2 w-full py-2 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-xl hover:bg-amber-100 transition flex items-center justify-center gap-2"
+                                    >
+                                        ⭐ Leave Feedback
+                                    </button>
+                                )}
+                            </div>
                         ))}
                     </div>
                 )}

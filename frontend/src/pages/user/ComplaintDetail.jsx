@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const STATUS_COLORS = {
     pending:     "bg-yellow-100 text-yellow-800",
@@ -20,6 +20,7 @@ const PRIORITY_COLORS = {
 
 const ComplaintDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { user } = useContext(AuthContext);
     const [complaint, setComplaint] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -47,6 +48,14 @@ const ComplaintDetail = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4">
             <div className="max-w-3xl mx-auto space-y-5">
+
+                {/* Back Button */}
+                <button
+                    onClick={() => navigate('/user/complaints')}
+                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition mb-1"
+                >
+                    ← Back to My Complaints
+                </button>
 
                 {/* Header */}
                 <div className="bg-white border border-gray-200 rounded-xl p-6">
@@ -111,6 +120,21 @@ const ComplaintDetail = () => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                )}
+
+                {/* Feedback Banner for resolved complaints */}
+                {complaint.status === 'resolved' && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+                        <div className="text-3xl mb-2">⭐</div>
+                        <h3 className="font-semibold text-amber-800 mb-1">This complaint has been resolved!</h3>
+                        <p className="text-sm text-amber-600 mb-4">How satisfied are you with the response? Share your feedback to help improve the service.</p>
+                        <button
+                            onClick={() => navigate(`/user/feedback/${id}`)}
+                            className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-xl transition shadow-sm"
+                        >
+                            Leave Feedback
+                        </button>
                     </div>
                 )}
 

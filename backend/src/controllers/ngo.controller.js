@@ -1,5 +1,6 @@
 const Complaint = require('../models/complaint.model');
 const NGO = require('../models/ngo.model');
+const { createNotification } = require('../services/notification.service');
 
 // @desc    Get NGO profile
 // @route   GET /api/ngo/profile
@@ -91,6 +92,15 @@ const selfAssignComplaint = async (req, res) => {
         complaint.status = 'in-progress';
         const updated = await complaint.save();
 
+        if (complaint.user_id) {
+            await createNotification(
+                complaint.user_id,
+                'Complaint Accepted',
+                `An NGO has accepted your complaint: "${complaint.title}"`,
+                complaint._id
+            );
+        }
+
         res.status(200).json(updated);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -110,12 +120,21 @@ const updateNgoComplaintStatus = async (req, res) => {
             return res.status(404).json({ message: 'Complaint not found' });
         }
 
-        if (complaint.assigned_to.toString() !== req.user._id.toString()) {
+        if (!complaint.assigned_to || complaint.assigned_to.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized for this complaint' });
         }
 
         complaint.status = status;
         const updated = await complaint.save();
+
+        if (complaint.user_id) {
+            await createNotification(
+                complaint.user_id,
+                'Status Updated',
+                `Your complaint "${complaint.title}" status changed to ${status}`,
+                complaint._id
+            );
+        }
 
         res.status(200).json(updated);
     } catch (error) {

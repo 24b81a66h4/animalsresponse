@@ -1,5 +1,6 @@
 const Complaint = require('../models/complaint.model');
 const { getIO } = require('../config/socket');
+const { createNotification } = require('../services/notification.service');
 
 const createComplaint = async (req, res) => {
     try {
@@ -104,15 +105,14 @@ const updateComplaintStatus = async (req, res) => {
         complaint.status = status;
         const updated = await complaint.save();
 
-        try {
-            const io = getIO();
-            if (complaint.user_id) {
-                io.to(complaint.user_id.toString()).emit('notification', {
-                    message: `Your complaint "${complaint.title}" status changed to ${status}`,
-                    complaintId: complaint._id,
-                });
-            }
-        } catch (_) {}
+        if (complaint.user_id) {
+            await createNotification(
+                complaint.user_id,
+                'Status Updated',
+                `Your complaint "${complaint.title}" status changed to ${status}`,
+                complaint._id
+            );
+        }
 
         res.status(200).json(updated);
     } catch (error) {
@@ -135,10 +135,20 @@ const assignComplaint = async (req, res) => {
         }
 
         complaint.assigned_to = ngo_user_id;
-        complaint.status = 'Assigned';
+        complaint.status = 'in-progress';
         const updated = await complaint.save();
+        const populated = await updated.populate('assigned_to', 'name email');
 
-        res.status(200).json(updated);
+        if (complaint.user_id) {
+            await createNotification(
+                complaint.user_id,
+                'NGO Assigned',
+                `An NGO has been assigned to your complaint: "${complaint.title}"`,
+                complaint._id
+            );
+        }
+
+        res.status(200).json(populated);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }

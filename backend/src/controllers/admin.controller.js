@@ -1,5 +1,6 @@
 const Complaint = require('../models/complaint.model');
 const NGO = require('../models/ngo.model');
+const { createNotification } = require('../services/notification.service');
 // @desc    Assign complaint to NGO
 // @route   PUT /api/admin/complaints/:id/assign
 // @access  Private (Admin)
@@ -18,11 +19,23 @@ const assignComplaint = async (req, res) => {
             return res.status(404).json({ message: 'NGO not found' });
         }
 
-        complaint.assigned_to = ngo_id;
-        complaint.status = 'Assigned';
+        complaint.assigned_to = ngo.user_id;
+        complaint.status = 'in-progress';
         const updatedComplaint = await complaint.save();
-        
-        res.status(200).json(updatedComplaint);
+        const populated = await Complaint.findById(updatedComplaint._id)
+            .populate('user_id', 'name email')
+            .populate('assigned_to', 'name email');
+
+        if (complaint.user_id) {
+            await createNotification(
+                complaint.user_id,
+                'NGO Assigned',
+                `An NGO has been assigned to your complaint: "${complaint.title}"`,
+                complaint._id
+            );
+        }
+
+        res.status(200).json(populated);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
