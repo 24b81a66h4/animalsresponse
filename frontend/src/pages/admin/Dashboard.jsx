@@ -72,6 +72,7 @@ const AdminDashboard = () => {
                 <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
                 <div className="space-x-4">
                     <span className="text-gray-600">Admin: {user?.name}</span>
+                    <button onClick={() => assignToNgo(complaint._id)}>Assign to NGO</button>
                     <button onClick={logout} className="text-red-600 hover:underline">Logout</button>
                 </div>
             </header>
