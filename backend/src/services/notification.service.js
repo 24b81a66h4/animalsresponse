@@ -1,15 +1,22 @@
-const Notification = require('../models/notification.model');
+const Notification = require('../models/notification');
 const { getIO } = require('../config/socket');
 
+/**
+ * Create a notification for a user and emit it via Socket.io
+ * @param {string} userId - ID of the user to notify
+ * @param {string} title - Notification title
+ * @param {string} message - Notification message
+ * @param {string} complaintId - ID of the related complaint
+ */
 const createNotification = async (userId, title, message, complaintId) => {
     try {
+        // 1. Save to Database for persistence
         const notification = await Notification.create({
             user: userId,
             title,
-            message,
-            complaint: complaintId || undefined
+            message
         });
-
+        // 2. Emit via Socket.io for real-time update
         try {
             const io = getIO();
             io.to(userId.toString()).emit('notification', {
@@ -30,4 +37,6 @@ const createNotification = async (userId, title, message, complaintId) => {
     }
 };
 
-module.exports = { createNotification };
+module.exports = {
+    createNotification
+};
