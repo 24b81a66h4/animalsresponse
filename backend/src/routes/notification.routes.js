@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
-const Notification = require('../models/Notification'); // ✅ FIXED
+const Notification = require('../models/notification.model');
 const { protect } = require('../middleware/auth.middleware');
 
 // @route   GET /api/notifications
