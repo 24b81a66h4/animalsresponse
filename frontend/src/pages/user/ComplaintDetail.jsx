@@ -81,7 +81,7 @@ const ComplaintDetail = () => {
           </div>
         </div>
 
-        {complaint.media?.length > 0 && (
+        {complaint.media?.length > 0 ? (
           <div className="bg-white border border-gray-200 rounded-xl p-6">
             <h2 className="text-sm font-medium text-gray-700 mb-3">
               Attached Media ({complaint.media.length})
@@ -106,6 +106,11 @@ const ComplaintDetail = () => {
                 </div>
               ))}
             </div>
+          </div>
+        ) : (
+          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
+            <p className="text-4xl mb-2">📎</p>
+            <p className="text-gray-500 font-medium">No files attached to this complaint.</p>
           </div>
         )}
 

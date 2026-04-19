@@ -130,9 +130,9 @@ const NGODashboard = () => {
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Reporter</th>
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Category</th>
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Priority</th>
-                                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Current Status</th>
+                                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Status</th>
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Media</th>
-                                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Update Status</th>
+                                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -184,16 +184,24 @@ const NGODashboard = () => {
                                         </div>
                                     </td>
                                     <td className="px-5 py-4 border-b border-gray-100">
-                                        <select
-                                            value={c.status?.toLowerCase()}
-                                            onChange={(e) => handleStatusChange(c._id, e.target.value)}
-                                            disabled={updating === c._id}
-                                            className="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none disabled:opacity-60"
-                                        >
-                                            <option value="pending">Pending</option>
-                                            <option value="in-progress">In Progress</option>
-                                            <option value="resolved">Resolved</option>
-                                        </select>
+                                        <div className="flex flex-col gap-2">
+                                            <select
+                                                value={c.status?.toLowerCase()}
+                                                onChange={(e) => handleStatusChange(c._id, e.target.value)}
+                                                disabled={updating === c._id}
+                                                className="border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none disabled:opacity-60"
+                                            >
+                                                <option value="pending">Pending</option>
+                                                <option value="in-progress">In Progress</option>
+                                                <option value="resolved">Resolved</option>
+                                            </select>
+                                            <Link 
+                                                to={`/user/complaints/${c._id}`}
+                                                className="text-center bg-emerald-50 text-emerald-700 py-1.5 rounded-lg text-xs font-bold hover:bg-emerald-100 transition border border-emerald-200"
+                                            >
+                                                View Details
+                                            </Link>
+                                        </div>
                                         {updating === c._id && (
                                             <span className="ml-2 text-xs text-gray-400">Saving...</span>
                                         )}

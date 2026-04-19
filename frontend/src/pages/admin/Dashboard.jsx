@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 import API from '../../services/api';
 
 // const BASE = import.meta.env.VITE_API_URL; // Replaced by API service
@@ -189,7 +190,9 @@ const AdminDashboard = () => {
                             {filtered.map(c => (
                                 <tr key={c._id} className="border-b hover:bg-gray-50 transition">
                                     <td className="px-4 py-3">
-                                        <p className="font-medium text-gray-800">{c.title}</p>
+                                        <Link to={`/user/complaints/${c._id}`} className="font-medium text-blue-700 hover:text-blue-900 hover:underline">
+                                            {c.title}
+                                        </Link>
                                         {c.location?.address && (
                                             <p className="text-xs text-gray-400 mt-0.5">📍 {c.location.address}</p>
                                         )}
@@ -204,10 +207,26 @@ const AdminDashboard = () => {
                                         {c.user_id?.name || <span className="italic text-gray-400">Unknown</span>}
                                     </td>
                                     <td className="px-4 py-3">
-                                        {c.assigned_to?.name
-                                            ? <span className="font-medium text-emerald-700">✅ {c.assigned_to.name}</span>
-                                            : <span className="italic text-gray-400">Not assigned</span>
-                                        }
+                                        <div className="flex flex-col gap-1">
+                                            {c.assigned_to?.name ? (
+                                                <span className="font-medium text-emerald-700 text-xs flex items-center gap-1">
+                                                    ✅ {c.assigned_to.name}
+                                                </span>
+                                            ) : (
+                                                <span className="italic text-gray-400 text-xs">Not assigned</span>
+                                            )}
+                                            <select
+                                                value={c.assigned_to?._id || ''}
+                                                onChange={(e) => assignNgo(c._id, e.target.value)}
+                                                disabled={assigning === c._id}
+                                                className="mt-1 block w-full text-xs border border-gray-300 rounded-lg p-1 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                            >
+                                                <option value="">{c.assigned_to ? 'Change NGO' : 'Assign NGO'}</option>
+                                                {ngoUsers.map(n => (
+                                                    <option key={n._id} value={n._id}>{n.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </td>
                                     <td className="px-4 py-3">
                                         <select

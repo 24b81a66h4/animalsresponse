@@ -84,7 +84,7 @@ const AssignedComplaints = () => {
           )}
 
           {/* Media Thumbnails */}
-          {c.media && c.media.length > 0 && (
+          {c.media && c.media.length > 0 ? (
             <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
               {c.media.map((m, i) => (
                 <div key={i} className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-gray-100 bg-gray-50 shadow-sm">
@@ -95,6 +95,10 @@ const AssignedComplaints = () => {
                   )}
                 </div>
               ))}
+            </div>
+          ) : (
+            <div className="mt-3 py-2 px-3 bg-gray-50 rounded-lg border border-dashed border-gray-200 text-center">
+              <span className="text-xs text-gray-400 italic">No files attached to this complaint</span>
             </div>
           )}
         </div>
@@ -122,6 +126,12 @@ const AssignedComplaints = () => {
             Accept & Assign to Me
           </button>
         )}
+        <Link
+          to={`/user/complaints/${c._id}`}
+          className="text-blue-600 text-sm font-semibold hover:underline px-2 py-1"
+        >
+          View Details →
+        </Link>
       </div>
     </div>
   );
