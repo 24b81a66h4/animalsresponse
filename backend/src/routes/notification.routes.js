@@ -7,7 +7,7 @@ const { protect } = require('../middleware/auth.middleware');
 // @access  Private
 router.get('/', protect, async (req, res) => {
     try {
-        const notifications = await Notification.find({ user_id: req.user._id })
+        const notifications = await Notification.find({ user: req.user._id })
             .sort({ createdAt: -1 });
 
         res.status(200).json(notifications);
@@ -27,7 +27,7 @@ router.put('/:id/read', protect, async (req, res) => {
         }
 
         // Optional safety check (recommended)
-        if (notification.user_id.toString() !== req.user._id.toString()) {
+        if (notification.user.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Not authorized' });
         }
 

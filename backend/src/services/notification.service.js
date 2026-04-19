@@ -14,7 +14,8 @@ const createNotification = async (userId, title, message, complaintId) => {
         const notification = await Notification.create({
             user: userId,
             title,
-            message
+            message,
+            complaint: complaintId
         });
         // 2. Emit via Socket.io for real-time update
         try {

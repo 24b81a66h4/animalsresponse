@@ -131,6 +131,7 @@ const NGODashboard = () => {
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Category</th>
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Priority</th>
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Current Status</th>
+                                <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Media</th>
                                 <th className="px-5 py-3 text-left text-xs font-semibold text-emerald-800 uppercase">Update Status</th>
                             </tr>
                         </thead>
@@ -138,7 +139,9 @@ const NGODashboard = () => {
                             {complaints.map(c => (
                                 <tr key={c._id} className="hover:bg-emerald-50/50 transition">
                                     <td className="px-5 py-4 border-b border-gray-100">
-                                        <p className="font-medium text-gray-800">{c.title}</p>
+                                        <Link to={`/user/complaints/${c._id}`} className="font-medium text-emerald-700 hover:text-emerald-900 hover:underline">
+                                            {c.title}
+                                        </Link>
                                         <p className="text-xs text-gray-400">{c.location?.address || 'No location'}</p>
                                         <p className="text-xs text-gray-400">🕒 {new Date(c.createdAt).toLocaleDateString()}</p>
                                     </td>
@@ -157,6 +160,28 @@ const NGODashboard = () => {
                                         <span className={`px-3 py-1 text-xs rounded-full font-medium capitalize ${STATUS_COLOR[c.status] || 'bg-gray-100 text-gray-700'}`}>
                                             {c.status}
                                         </span>
+                                    </td>
+                                    <td className="px-5 py-4 border-b border-gray-100">
+                                        <div className="flex -space-x-2">
+                                            {c.media && c.media.length > 0 ? (
+                                                c.media.slice(0, 3).map((m, i) => (
+                                                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-gray-100 shadow-sm">
+                                                        {m.resource_type === 'video' ? (
+                                                            <div className="w-full h-full flex items-center justify-center bg-emerald-100 text-[8px]">▶️</div>
+                                                        ) : (
+                                                            <img src={m.url} className="w-full h-full object-cover" alt="" />
+                                                        )}
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <span className="text-gray-300 text-xs">No media</span>
+                                            )}
+                                            {c.media && c.media.length > 3 && (
+                                                <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600 shadow-sm">
+                                                    +{c.media.length - 3}
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-5 py-4 border-b border-gray-100">
                                         <select

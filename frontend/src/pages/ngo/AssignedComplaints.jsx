@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 import API from "../../services/api";
 
 const BASE = `${import.meta.env.VITE_API_URL}/ngo`;
@@ -66,7 +67,9 @@ const AssignedComplaints = () => {
     <div className="border p-4 mb-3 rounded-xl shadow-sm bg-white">
       <div className="flex justify-between items-start">
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-800">{c.title}</h3>
+          <Link to={`/user/complaints/${c._id}`} className="font-semibold text-blue-600 hover:underline">
+            {c.title}
+          </Link>
           <p className="text-sm text-gray-500 mt-1">{c.description}</p>
           <p className="text-xs text-gray-400 mt-2">
             📍 {c.location?.address || "No location provided"}
@@ -78,6 +81,21 @@ const AssignedComplaints = () => {
             <p className="text-xs text-gray-400">
               👤 Reported by: {c.user_id.name}
             </p>
+          )}
+
+          {/* Media Thumbnails */}
+          {c.media && c.media.length > 0 && (
+            <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+              {c.media.map((m, i) => (
+                <div key={i} className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-gray-100 bg-gray-50 shadow-sm">
+                  {m.resource_type === 'video' ? (
+                    <div className="w-full h-full flex items-center justify-center bg-blue-50 text-xs">▶️</div>
+                  ) : (
+                    <img src={m.url} className="w-full h-full object-cover" alt="" />
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
         <span className={`px-2 py-1 text-xs rounded-full font-medium ml-3 ${statusColor(c.status)}`}>

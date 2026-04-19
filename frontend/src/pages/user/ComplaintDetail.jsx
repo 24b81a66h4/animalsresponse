@@ -48,10 +48,10 @@ const ComplaintDetail = () => {
       <div className="max-w-3xl mx-auto space-y-5">
 
         <button
-          onClick={() => navigate('/user/complaints')}
+          onClick={() => navigate(user?.role === 'ngo' ? '/ngo/dashboard' : '/user/complaints')}
           className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition mb-1"
         >
-          ← Back to My Complaints
+          ← Back to {user?.role === 'ngo' ? 'Dashboard' : 'My Complaints'}
         </button>
 
         <div className="bg-white border border-gray-200 rounded-xl p-6">

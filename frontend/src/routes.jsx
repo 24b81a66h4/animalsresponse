@@ -80,7 +80,7 @@ const AppRoutes = () => {
                     <Route
                         path="/user/complaints/:id"
                         element={
-                            <ProtectedRoute roles={['user', 'admin']}>
+                            <ProtectedRoute roles={['user', 'admin', 'ngo']}>
                                 <ComplaintDetail />
                             </ProtectedRoute>
                         }
