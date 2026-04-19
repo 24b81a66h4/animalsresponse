@@ -10,13 +10,33 @@ const adminRoutes = require('./routes/admin.routes');
 const ngoRoutes = require('./routes/ngo.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
 const notificationRoutes = require('./routes/notification.routes');
-const feedbackRoutes = require('./routes/feedback.routes'); // ✅ ADDED
+const feedbackRoutes = require('./routes/feedback.routes');
 
 const errorHandler = require('./utils/errorHandler');
 
 const app = express();
 
-app.use(cors());
+// ✅ CORS — allow your Vercel frontend + localhost for dev
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  // Add your Vercel URL here — keep both with and without trailing slash
+  process.env.FRONTEND_URL,
+  'https://animalsresponse.vercel.app',
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -27,11 +47,11 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/ngo', ngoRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/feedback', feedbackRoutes); // ✅ ADDED
+app.use('/api/feedback', feedbackRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'ok', message: 'Server is running' });
+  res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
 
 // Error handler

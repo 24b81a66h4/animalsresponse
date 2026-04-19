@@ -4,6 +4,7 @@ const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
 });
 
+// Attach token from stored user object on every request
 API.interceptors.request.use((req) => {
   try {
     const stored = localStorage.getItem("user");
@@ -14,7 +15,7 @@ API.interceptors.request.use((req) => {
       }
     }
   } catch (e) {
-    console.error("Failed to read user token", e);
+    // ignore parse errors
   }
   return req;
 });
