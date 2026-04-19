@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import API from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
 const Home = () => {
@@ -11,7 +11,7 @@ const Home = () => {
     useEffect(() => {
         const fetchPublicComplaints = async () => {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL}/complaints/public`);
+                const res = await API.get('/complaints/public');
                 setPublicComplaints(res.data);
             } catch (err) {
                 console.error('Failed to fetch public complaints', err);

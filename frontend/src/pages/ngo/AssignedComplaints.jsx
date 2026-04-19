@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
+import API from "../../services/api";
 
 const BASE = `${import.meta.env.VITE_API_URL}/ngo`;
 
@@ -11,17 +11,15 @@ const AssignedComplaints = () => {
   const [assigned, setAssigned] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const headers = { Authorization: `Bearer ${user?.token}` };
-
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [availRes, assignRes] = await Promise.all([
-        axios.get(`${BASE}/available-complaints`, { headers }),
-        axios.get(`${BASE}/complaints`, { headers }),
+      const [availRes, myRes] = await Promise.all([
+        API.get('/ngo/available-complaints'),
+        API.get('/ngo/complaints'),
       ]);
       setAvailable(availRes.data);
-      setAssigned(assignRes.data);
+      setAssigned(myRes.data);
     } catch (err) {
       console.error("Fetch error:", err.response?.data || err.message);
     } finally {
@@ -31,7 +29,7 @@ const AssignedComplaints = () => {
 
   const selfAssign = async (id) => {
     try {
-      await axios.put(`${BASE}/complaints/${id}/assign`, {}, { headers });
+      await API.put(`/ngo/complaints/${id}/assign`, {});
       alert("Complaint assigned to you!");
       fetchData();
     } catch (err) {
@@ -41,7 +39,7 @@ const AssignedComplaints = () => {
 
   const updateStatus = async (id, status) => {
     try {
-      await axios.put(`${BASE}/complaints/${id}/status`, { status }, { headers });
+      await API.put(`/ngo/complaints/${id}/status`, { status });
       setAssigned((prev) =>
         prev.map((c) => (c._id === id ? { ...c, status } : c))
       );

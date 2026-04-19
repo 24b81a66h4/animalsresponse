@@ -1,17 +1,21 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
 });
 
-// 🔥 FIXED TOKEN HANDLING
 API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+  try {
+    const stored = localStorage.getItem("user");
+    if (stored && stored !== "undefined") {
+      const user = JSON.parse(stored);
+      if (user?.token) {
+        req.headers.Authorization = `Bearer ${user.token}`;
+      }
+    }
+  } catch (e) {
+    console.error("Failed to read user token", e);
   }
-
   return req;
 });
 

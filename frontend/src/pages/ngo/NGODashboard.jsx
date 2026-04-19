@@ -2,8 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
+import API from '../../services/api';
 
-const BASE = `${import.meta.env.VITE_API_URL}/ngo`;
+// const BASE = `${import.meta.env.VITE_API_URL}/ngo`; // Replaced by API service
 
 const STATUS_COLOR = {
     'pending':     'bg-yellow-100 text-yellow-800',
@@ -26,7 +27,7 @@ const NGODashboard = () => {
     const [loading, setLoading] = useState(false);
     const [updating, setUpdating] = useState(null);
 
-    const headers = { Authorization: `Bearer ${user?.token}` };
+    // const headers = { Authorization: `Bearer ${user?.token}` }; // Replaced by API interceptor
 
     useEffect(() => {
         if (!user) return;
@@ -37,7 +38,7 @@ const NGODashboard = () => {
         try {
             setLoading(true);
             // Use the NGO-specific endpoint which returns only this NGO's complaints
-            const res = await axios.get(`${BASE}/complaints`, { headers });
+            const res = await API.get('/ngo/complaints');
             setComplaints(res.data);
         } catch (err) {
             console.error('Failed to fetch complaints', err);
@@ -49,10 +50,9 @@ const NGODashboard = () => {
     const handleStatusChange = async (id, newStatus) => {
         try {
             setUpdating(id);
-            await axios.put(
-                `${BASE}/complaints/${id}/status`,
-                { status: newStatus },
-                { headers }
+            await API.put(
+                `/ngo/complaints/${id}/status`,
+                { status: newStatus }
             );
             setComplaints(prev =>
                 prev.map(c => c._id === id ? { ...c, status: newStatus } : c)

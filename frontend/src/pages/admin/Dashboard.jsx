@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
+import API from '../../services/api';
 
-const BASE = import.meta.env.VITE_API_URL;
+// const BASE = import.meta.env.VITE_API_URL; // Replaced by API service
 
 const STATUS_COLOR = {
     'pending':     'bg-yellow-100 text-yellow-800',
@@ -21,7 +21,7 @@ const AdminDashboard = () => {
     const [filterStatus, setFilterStatus] = useState('all');
     const [search, setSearch] = useState('');
 
-    const headers = { Authorization: `Bearer ${user?.token}` };
+    // const headers = { Authorization: `Bearer ${user?.token}` }; // Replaced by API interceptor
 
     useEffect(() => {
         if (!user) return;
@@ -32,7 +32,7 @@ const AdminDashboard = () => {
     const fetchComplaints = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${BASE}/complaints`, { headers });
+            const res = await API.get('/complaints');
             setComplaints(res.data);
         } catch (err) {
             console.error('Failed to fetch complaints', err);
@@ -43,7 +43,7 @@ const AdminDashboard = () => {
 
     const fetchNgoUsers = async () => {
         try {
-            const res = await axios.get(`${BASE}/admin/ngo-users`, { headers });
+            const res = await API.get('/admin/ngo-users');
             setNgoUsers(res.data);
         } catch (err) {
             console.error('Failed to fetch NGO users', err);
@@ -54,10 +54,9 @@ const AdminDashboard = () => {
         if (!ngoUserId) return;
         try {
             setAssigning(complaintId);
-            const res = await axios.put(
-                `${BASE}/complaints/${complaintId}/assign`,
-                { ngo_user_id: ngoUserId },
-                { headers }
+            const res = await API.put(
+                `/complaints/${complaintId}/assign`,
+                { ngo_user_id: ngoUserId }
             );
             // Update complaint in local state with fresh populated data
             setComplaints(prev =>
@@ -73,10 +72,9 @@ const AdminDashboard = () => {
     const updateStatus = async (complaintId, newStatus) => {
         try {
             setAssigning(complaintId);
-            const res = await axios.put(
-                `${BASE}/complaints/${complaintId}/status`,
-                { status: newStatus },
-                { headers }
+            const res = await API.put(
+                `/complaints/${complaintId}/status`,
+                { status: newStatus }
             );
             setComplaints(prev =>
                 prev.map(c => c._id === complaintId ? { ...c, status: newStatus } : c)
